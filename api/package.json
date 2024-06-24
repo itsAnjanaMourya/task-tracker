@@ -1,0 +1,11 @@
+{
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "nodemon --es-module-specifier-resolution=node index.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "nodemon": "^3.0.1"
+  }
+}
