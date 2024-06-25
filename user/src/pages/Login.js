@@ -1,39 +1,40 @@
 import { Link } from "react-router-dom"
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import axios from 'axios';
 
 const Login = () => {
     const navigate = useNavigate();
-    const [data, setData] = useState({
-        name: '',
-        email: '',
-        password: ''
-    });
-
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    axios.defaults.withCredentials =true;
     function handleSubmit(e) {
         e.preventDefault();
-        console.log("Login Details: ", data);
-        navigate("/home");
-    }
-    function handleChange(e) {
-        const { name, value } = e.target;
-        setData((prev) => ({
-            ...prev, [name]: value
-        }
-        ))
-    }
+        axios.post('http://localhost:3002/api/auth/login',{
+            email,
+            password
+        }).then(response=>{
+            if(response.data.status){
+                navigate("/");
+            }
+            console.log(response)
+        }).catch(err=>{
+            console.log(err)
+        })
+       
 
+    }
+    
     return (
         <div className="auth">
             <h1>Login</h1>
             <form onSubmit={handleSubmit}>
-                <input type="text" placeholder="username" name="name" value={data.name} onChange={handleChange} /><br />
-                <input type="email" placeholder="email" value={data.email} name="email" onChange={handleChange} /><br />
-                <input type="password" placeholder="password" value={data.password} name="password" onChange={handleChange} /><br />
+                <input type="email" placeholder="email" value={email} name="email" onChange={(e)=>setEmail(e.target.value)} /><br />
+                <input type="password" placeholder="password" value={password} name="password" onChange={(e)=>setPassword(e.target.value)} /><br />
                 <span>
                     Don't you have an account? <Link to="/register">Register</Link>
                 </span>
-                <button onClick={() => navigate("/login")}>login</button>
+                <button>login</button>
                 <h1> Welcome to the Home Page!</h1>
 
             </form>
