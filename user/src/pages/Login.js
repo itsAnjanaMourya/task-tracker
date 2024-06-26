@@ -1,28 +1,23 @@
 import { Link } from "react-router-dom"
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import axios from 'axios';
+import { AuthContext } from "../context/authContext";
 
 const Login = () => {
     const navigate = useNavigate();
+    const {login} = useContext(AuthContext)
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     axios.defaults.withCredentials =true;
-    function handleSubmit(e) {
+    const handleSubmit = async(e) => {
         e.preventDefault();
-        axios.post('http://localhost:3002/api/auth/login',{
-            email,
-            password
-        }).then(response=>{
-            if(response.data.status){
-                navigate("/");
-            }
-            console.log(response)
-        }).catch(err=>{
+        try{
+            await login({email, password})
+            navigate("/");
+        }catch(err){
             console.log(err)
-        })
-       
-
+        }
     }
     
     return (

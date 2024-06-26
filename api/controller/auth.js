@@ -9,7 +9,7 @@ export const register = async (req,res)=>{
     const {name, email, password} = req.body;
     const user = await User.findOne({email})
     if(user){
-        return res.json({message: "user already exist"})
+        return res.status(400).json({message: "user already exist"})
     }
     const hashPassword = await bcrypt.hash(password, 10);
 
@@ -19,7 +19,7 @@ export const register = async (req,res)=>{
        password: hashPassword 
     })
     await newUser.save();
-    await res.json({status: true, message: "record registered"})
+    await res.status(201).json({status: true, message: "record registered"})
 
 }
 export const login = async (req,res)=>{
@@ -28,15 +28,30 @@ export const login = async (req,res)=>{
     const user = await User.findOne({email})
 
     if(!user){
-        return res.json({message: "user not already exist"})
+        return res.status(404).json({message: "user not already exist"})
     }
     const validPassword = await bcrypt.compare(password, user.password)
     
      if(!validPassword){
-        return res.json({message: "incorrect password"})
+        return res.status(401).json({message: "incorrect password"})
     }
 
-    const token = jwt.sign({name: user.name}, `${process.env.NODE_ENV_KEY}`, {expiresIn: '1h'})
+    const token = jwt.sign({name: user.name}, process.env.NODE_ENV_KEY, {expiresIn: '1h'})
     res.cookie('token', token, {httpOnly:true, maxAge: 360000})
-     await res.json({status: true, message: "Login successful"})
+     await res.json({status: true, message: "Login successful", email:user.email, name:user.name})
+}
+
+
+export const logout = (req,res)=>{
+    res.clearCookie("access_token", {
+        sameSite:"none",
+        secure:true
+    }).status(200).json({signout:true,message:"User has been logged out."})
+console.log(res)
+};
+
+export const myTask = async(req,res)=>{
+    const list = req.body;
+    console.log("asas",list)
+    await res.json({status: true, message: "user task..",list:list})
 }
