@@ -16,7 +16,7 @@ export const AuthContextProvider = ({children})=>{
             console.log("user", res.data);
 
             setIsAuthenticated(true);
-            setCurrentUser({ name: res.data.name, email: res.data.email });
+            setCurrentUser({ name: res.data.name, email: res.data.email, list: res.data.list });
             setUserName(res.data.name); 
         } catch (err) {
             console.error("Login error:", err);
@@ -55,7 +55,7 @@ export const AuthContextProvider = ({children})=>{
     // },[currentUser])
 
     return(
-        <AuthContext.Provider value={{ isAuthenticated, userName, currentUser, login, logout }}>
+        <AuthContext.Provider value={{ isAuthenticated, userName, currentUser, setCurrentUser, login, logout }}>
         {children}
 
         </AuthContext.Provider>

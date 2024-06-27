@@ -4,30 +4,32 @@ import axios from "axios";
 import { useEffect } from "react";
 
 const Home = () => {
-    const { isAuthenticated, currentUser, logout } = useContext(AuthContext);
+    const { isAuthenticated, currentUser, setCurrentUser, logout } = useContext(AuthContext);
     const [task, setTask] = useState({ text: "", status: "", error: "" });
     const [list, setToList] = useState([]);
     const [currentUserTasks, setCurrentUserTasks] = useState([]);
 
     useEffect(() => {
+        console.log("inside effect...")
         if (list.length != 0) {
+            console.log("inside list condition")
             const fetchData = async () => {
-                let res;
                 try {
-                    res = await axios.post(`http://localhost:3002/api/auth/myTask`, list)
-                    console.log("sss")
-                    console.log(res)
+                    await axios.post(`http://localhost:3002/api/auth/myTask`,{ list, email:currentUser.email})
+                               .then(res => {setCurrentUser({...currentUser, list:res.data.list}); setCurrentUserTasks(res.data.list)})
                 }
                 catch (err) {
-                    console.log("saas")
                     console.log(err)
-                }
-                setCurrentUserTasks(res.data.list)
-                console.log(currentUserTasks);
+                }         
             }
             fetchData();
+        } else {
+            setToList(currentUser.list)
+            setCurrentUserTasks(currentUser.list)
         }
     }, [list])
+
+
     function handleChange(e) {
         e.preventDefault();
         if (task.text.trim() && task.status !== '') {

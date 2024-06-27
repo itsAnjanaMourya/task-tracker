@@ -26,7 +26,6 @@ export const login = async (req,res)=>{
     console.log(process.env.NODE_ENV_KEY)
     const {email, password} = req.body;
     const user = await User.findOne({email})
-
     if(!user){
         return res.status(404).json({message: "user not already exist"})
     }
@@ -38,7 +37,7 @@ export const login = async (req,res)=>{
 
     const token = jwt.sign({name: user.name}, process.env.NODE_ENV_KEY, {expiresIn: '1h'})
     res.cookie('token', token, {httpOnly:true, maxAge: 360000})
-     await res.json({status: true, message: "Login successful", email:user.email, name:user.name})
+     await res.json({status: true, message: "Login successful", email:user.email, name:user.name, list:user.list})
 }
 
 
@@ -51,7 +50,23 @@ console.log(res)
 };
 
 export const myTask = async(req,res)=>{
-    const list = req.body;
-    console.log("asas",list)
-    await res.json({status: true, message: "user task..",list:list})
+    const {email} = req.body;
+    const list = req.body.list;
+    const user = await User.findOne({email})
+
+    user.list = list;
+    console.log("list to db",user.list)
+    await user.save()
+
+    const currentUser = await User.findOne({email})
+    console.log("list from db",currentUser.list)
+
+    await res.json({status: true, message: "user task..",list:currentUser.list})
+}
+
+export const getTask = async(req,res)=>{
+    const user = await User.findOne({email})
+    const list = user.list;
+    console.log("zjdhdbhj",list)
+    await res.json({status: true, message: "user task getting from db",list:list})
 }
